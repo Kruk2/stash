@@ -109,7 +109,7 @@ export const SearchTermInput: React.FC<{
   );
 };
 
-const PAGE_SIZE_OPTIONS = ["20", "40", "60", "120", "250", "500", "1000"];
+const PAGE_SIZE_OPTIONS = ["20", "40", "60", "120", "250", "500", "1000", "10000"];
 
 export const PageSizeSelector: React.FC<{
   pageSize: number;
