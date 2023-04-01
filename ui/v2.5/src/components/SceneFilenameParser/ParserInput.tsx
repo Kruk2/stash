@@ -128,7 +128,7 @@ export const ParserInput: React.FC<IParserInputProps> = (
     setPattern(pattern + field.getFieldPattern());
   }
 
-  const PAGE_SIZE_OPTIONS = ["20", "40", "60", "120", "250", "500", "1000"];
+  const PAGE_SIZE_OPTIONS = ["20", "40", "60", "120", "250", "500", "1000", "10000"];
 
   return (
     <Form.Group>
