@@ -53,6 +53,7 @@ FROM (
 	INNER JOIN files ON (scenes_files.file_id = files.id)
 	INNER JOIN files_fingerprints ON (scenes_files.file_id = files_fingerprints.file_id AND files_fingerprints.type = 'phash')
 	INNER JOIN video_files ON (files.id == video_files.file_id)
+	WHERE files_fingerprints.fingerprint != 0
 )
 WHERE durationDiff <= ?1
     OR ?1 < 0   --  Always TRUE if the parameter is negative.
@@ -72,6 +73,7 @@ INNER JOIN scenes_files ON (scenes.id = scenes_files.scene_id)
 INNER JOIN files ON (scenes_files.file_id = files.id)
 INNER JOIN files_fingerprints ON (scenes_files.file_id = files_fingerprints.file_id AND files_fingerprints.type = 'phash')
 INNER JOIN video_files ON (files.id == video_files.file_id)
+WHERE files_fingerprints.fingerprint != 0
 ORDER BY files.size DESC;
 `
 
