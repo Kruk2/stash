@@ -275,7 +275,7 @@ generate: generate-backend generate-ui
 
 .PHONY: generate-ui
 generate-ui:
-	cd ui/v2.5 && npm run gqlgen
+	cd ui/v2.5 && npm.cmd run gqlgen
 
 .PHONY: generate-backend
 generate-backend: touch-ui
@@ -369,7 +369,7 @@ ui: ui-only generate-login-locale
 
 .PHONY: ui-only
 ui-only: ui-env
-	cd ui/v2.5 && npm run build
+	cd ui/v2.5 && npm.cmd run build
 
 .PHONY: zip-ui
 zip-ui:
@@ -382,12 +382,12 @@ ui-start: ui-env
 
 .PHONY: fmt-ui
 fmt-ui:
-	cd ui/v2.5 && npm run format
+	cd ui/v2.5 && npm.cmd run format
 
 # runs all of the frontend PR-acceptance steps
 .PHONY: validate-ui
 validate-ui:
-	cd ui/v2.5 && npm run validate
+	cd ui/v2.5 && npm.cmd run validate
 
 # these targets run the same steps as fmt-ui and validate-ui, but only on files that have changed
 fmt-ui-quick:
