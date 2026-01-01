@@ -60,6 +60,9 @@ func (rs sceneRoutes) Routes() chi.Router {
 		// streaming endpoints
 		r.Get("/stream", rs.StreamDirect)
 		r.Get("/stream.mp4", rs.StreamMp4)
+		r.Get("/stream.lada", rs.StreamLada)
+		r.Get("/stream-lada.mp4", rs.StreamLada)
+		r.Get("/stream-lada.webm", rs.StreamLada)
 		r.Get("/stream.webm", rs.StreamWebM)
 		r.Get("/stream.mkv", rs.StreamMKV)
 		r.Get("/stream.m3u8", rs.StreamHLS)
@@ -100,6 +103,31 @@ func (rs sceneRoutes) StreamDirect(w http.ResponseWriter, r *http.Request) {
 
 func (rs sceneRoutes) StreamMp4(w http.ResponseWriter, r *http.Request) {
 	rs.streamTranscode(w, r, ffmpeg.StreamTypeMP4)
+}
+
+func (rs sceneRoutes) StreamLada(w http.ResponseWriter, r *http.Request) {
+	scene := r.Context().Value(sceneKey).(*models.Scene)
+
+	streamManager := manager.GetInstance().StreamManager
+	if streamManager == nil {
+		http.Error(w, "Live transcoding disabled", http.StatusServiceUnavailable)
+		return
+	}
+
+	f := scene.Files.Primary()
+	if f == nil {
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		logger.Warnf("[transcode] error parsing query form: %v", err)
+	}
+
+	startTime := r.Form.Get("start")
+	ss, _ := strconv.ParseFloat(startTime, 64)
+
+	logger.Debugf("[transcode] streaming scene %d via lada-streamer", scene.ID)
+	streamManager.ServeLada(w, r, f, ss)
 }
 
 func (rs sceneRoutes) StreamWebM(w http.ResponseWriter, r *http.Request) {

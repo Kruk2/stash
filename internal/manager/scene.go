@@ -33,6 +33,11 @@ var (
 		mimeType:  ffmpeg.MimeMp4Video,
 		extension: ".mp4",
 	}
+	ladaEndpointType = endpointType{
+		label:     "Lada",
+		mimeType:  ffmpeg.MimeWebmVideo,
+		extension: "-lada.webm",
+	}
 	mkvEndpointType = endpointType{
 		label: "MKV",
 		// use mp4 mimetype to trick the client, since many clients won't try mkv
@@ -175,6 +180,8 @@ func GetSceneStreamPaths(scene *models.Scene, directStreamURL *url.URL, maxStrea
 		hlsStreams = append(hlsStreams, makeStreamEndpoint(hlsEndpointType, models.StreamingResolutionEnumOriginal))
 		dashStreams = append(dashStreams, makeStreamEndpoint(dashEndpointType, models.StreamingResolutionEnumOriginal))
 	}
+
+	endpoints = append(endpoints, makeStreamEndpoint(ladaEndpointType, ""))
 
 	if includeSceneStreamPath(models.StreamingResolutionEnumFourK) {
 		mp4Streams = append(mp4Streams, makeStreamEndpoint(mp4EndpointType, models.StreamingResolutionEnumFourK))

@@ -31,6 +31,8 @@ type StreamManager struct {
 	context    context.Context
 	cancelFunc context.CancelFunc
 
+	lada *ladaStreamManager
+
 	runningStreams map[string]*runningStream
 	streamsMutex   sync.Mutex
 }
@@ -57,6 +59,7 @@ func NewStreamManager(cacheDir string, encoder *FFMpeg, ffprobe *FFProbe, config
 		lockManager:    lockManager,
 		context:        ctx,
 		cancelFunc:     cancel,
+		lada:           newLadaStreamManager(lockManager, ctx),
 		runningStreams: make(map[string]*runningStream),
 	}
 
@@ -76,6 +79,9 @@ func NewStreamManager(cacheDir string, encoder *FFMpeg, ffprobe *FFProbe, config
 
 // Shutdown shuts down the stream manager, killing any running transcoding processes and removing all cached files.
 func (sm *StreamManager) Shutdown() {
+	if sm.lada != nil {
+		sm.lada.Shutdown()
+	}
 	sm.cancelFunc()
 	sm.stopAndRemoveAll()
 }
