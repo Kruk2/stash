@@ -219,6 +219,15 @@ fragment ConfigDefaultSettingsData on ConfigDefaultSettingsResult {
   deleteGenerated
 }
 
+fragment ConfigJasnaData on ConfigJasnaResult {
+  presets {
+    name
+    maxClipSize
+    temporalOverlap
+    secondaryRestoration
+  }
+}
+
 fragment ConfigData on ConfigResult {
   general {
     ...ConfigGeneralData
@@ -237,4 +246,7 @@ fragment ConfigData on ConfigResult {
   }
   ui
   plugins
+  jasna {
+    ...ConfigJasnaData
+  }
 }

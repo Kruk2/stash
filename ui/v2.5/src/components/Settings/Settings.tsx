@@ -16,6 +16,7 @@ import { SettingsToolsPanel } from "./SettingsToolsPanel";
 import { SettingsServicesPanel } from "./SettingsServicesPanel";
 import { SettingsContext, useSettings } from "./context";
 import { SettingsLibraryPanel } from "./SettingsLibraryPanel";
+import { SettingsJasnaPanel } from "./SettingsJasnaPanel";
 import { SettingsSecurityPanel } from "./SettingsSecurityPanel";
 import Changelog from "../Changelog/Changelog";
 import { TroubleshootingModeButton } from "../TroubleshootingMode/TroubleshootingModeButton";
@@ -28,6 +29,7 @@ const validTabs = [
   "security",
   "metadata-providers",
   "services",
+  "jasna",
   "system",
   "plugins",
   "logs",
@@ -94,6 +96,13 @@ const SettingTabs: React.FC<{ tab: TabKey }> = ({ tab }) => {
               <LinkContainer to="/settings?tab=services">
                 <Nav.Link eventKey="services">
                   <FormattedMessage id="config.categories.services" />
+                </Nav.Link>
+              </LinkContainer>
+            </Nav.Item>
+            <Nav.Item>
+              <LinkContainer to="/settings?tab=jasna">
+                <Nav.Link eventKey="jasna">
+                  <FormattedMessage id="config.categories.jasna" />
                 </Nav.Link>
               </LinkContainer>
             </Nav.Item>
@@ -176,6 +185,9 @@ const SettingTabs: React.FC<{ tab: TabKey }> = ({ tab }) => {
             </Tab.Pane>
             <Tab.Pane eventKey="services" unmountOnExit>
               <SettingsServicesPanel />
+            </Tab.Pane>
+            <Tab.Pane eventKey="jasna" unmountOnExit>
+              <SettingsJasnaPanel />
             </Tab.Pane>
             <Tab.Pane eventKey="tools" unmountOnExit>
               <SettingsToolsPanel />

@@ -587,6 +587,30 @@ input ConfigDefaultSettingsInput {
   deleteGenerated: Boolean
 }
 
+"Jasna AI upscaling preset"
+type JasnaPreset {
+  name: String!
+  maxClipSize: Int!
+  temporalOverlap: Int!
+  secondaryRestoration: String
+}
+
+input JasnaPresetInput {
+  name: String!
+  maxClipSize: Int!
+  temporalOverlap: Int!
+  secondaryRestoration: String
+}
+
+"Jasna configuration"
+type ConfigJasnaResult {
+  presets: [JasnaPreset!]!
+}
+
+input ConfigJasnaInput {
+  presets: [JasnaPresetInput!]!
+}
+
 "All configuration settings"
 type ConfigResult {
   general: ConfigGeneralResult!
@@ -596,6 +620,7 @@ type ConfigResult {
   defaults: ConfigDefaultSettingsResult!
   ui: Map!
   plugins(include: [ID!]): PluginConfigMap!
+  jasna: ConfigJasnaResult!
 }
 
 "Directory structure of a path"

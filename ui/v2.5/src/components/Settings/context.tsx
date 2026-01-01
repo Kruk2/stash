@@ -13,6 +13,7 @@ import {
   useConfigureDLNA,
   useConfigureGeneral,
   useConfigureInterface,
+  useConfigureJasna,
   useConfigurePlugin,
   useConfigureScraping,
   useConfigureUI,
@@ -34,6 +35,7 @@ export interface ISettingsContextState {
   dlna: GQL.ConfigDlnaInput;
   ui: IUIConfig;
   plugins: PluginConfigs;
+  jasna: GQL.ConfigJasnaInput;
 
   advancedMode: boolean;
 
@@ -46,6 +48,7 @@ export interface ISettingsContextState {
   saveScraping: (input: Partial<GQL.ConfigScrapingInput>) => void;
   saveDLNA: (input: Partial<GQL.ConfigDlnaInput>) => void;
   saveUI: (input: Partial<IUIConfig>) => void;
+  saveJasna: (input: Partial<GQL.ConfigJasnaInput>) => void;
   savePluginSettings: (pluginID: string, input: {}) => void;
   setAdvancedMode: (value: boolean) => void;
 
@@ -64,6 +67,7 @@ const emptyState: ISettingsContextState = {
   dlna: {},
   ui: {},
   plugins: {},
+  jasna: {},
 
   advancedMode: false,
 
@@ -75,6 +79,7 @@ const emptyState: ISettingsContextState = {
   saveScraping: noop,
   saveDLNA: noop,
   saveUI: noop,
+  saveJasna: noop,
   savePluginSettings: noop,
   setAdvancedMode: noop,
 
@@ -142,6 +147,10 @@ export const SettingsContext: React.FC = ({ children }) => {
   const [pendingPlugins, setPendingPlugins] = useState<PluginConfigs>();
   const [updatePluginConfig] = useConfigurePlugin();
 
+  const [jasna, setJasna] = useState<GQL.ConfigJasnaInput>({});
+  const [pendingJasna, setPendingJasna] = useState<GQL.ConfigJasnaInput>();
+  const [updateJasnaConfig] = useConfigureJasna();
+
   const [updateSuccess, setUpdateSuccess] = useState<boolean>();
 
   const [apiKey, setApiKey] = useState("");
@@ -164,6 +173,7 @@ export const SettingsContext: React.FC = ({ children }) => {
     setDLNA({ ...withoutTypename(data.configuration.dlna) });
     setUI(data.configuration.ui);
     setPlugins(data.configuration.plugins);
+    setJasna(data.configuration.jasna ? { ...withoutTypename(data.configuration.jasna) } : {});
   }, [data, error]);
 
   const resetSuccess = useDebounce(() => setUpdateSuccess(undefined), 4000);
@@ -531,6 +541,51 @@ export const SettingsContext: React.FC = ({ children }) => {
     });
   }
 
+  // saves the configuration if no further changes are made after a half second
+  const saveJasnaConfig = useDebounce(
+    async (input: GQL.ConfigJasnaInput) => {
+      try {
+        setUpdateSuccess(undefined);
+        await updateJasnaConfig({
+          variables: {
+            input,
+          },
+        });
+
+        setPendingJasna(undefined);
+        onSuccess();
+      } catch (e) {
+        onError(e);
+      }
+    },
+    500
+  );
+
+  useEffect(() => {
+    if (!pendingJasna) {
+      return;
+    }
+
+    saveJasnaConfig(pendingJasna);
+  }, [pendingJasna, saveJasnaConfig]);
+
+  function saveJasna(input: Partial<GQL.ConfigJasnaInput>) {
+    setJasna({
+      ...jasna,
+      ...input,
+    });
+
+    setPendingJasna((current) => {
+      if (!current) {
+        return input;
+      }
+      return {
+        ...current,
+        ...input,
+      };
+    });
+  }
+
   function maybeRenderLoadingIndicator() {
     if (updateSuccess === false) {
       return (
@@ -547,6 +602,7 @@ export const SettingsContext: React.FC = ({ children }) => {
       pendingScraping ||
       pendingDLNA ||
       pendingUI ||
+      pendingJasna ||
       pendingPlugins
     ) {
       return (
@@ -580,6 +636,7 @@ export const SettingsContext: React.FC = ({ children }) => {
         dlna,
         ui,
         plugins,
+        jasna,
         advancedMode: ui.advancedMode ?? false,
         saveGeneral,
         saveInterface,
@@ -587,6 +644,7 @@ export const SettingsContext: React.FC = ({ children }) => {
         saveScraping,
         saveDLNA,
         saveUI,
+        saveJasna,
         refetch,
         savePluginSettings,
         setAdvancedMode,

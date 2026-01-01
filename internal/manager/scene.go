@@ -56,6 +56,33 @@ var (
 	}
 )
 
+func getJasnaEndpointTypes() []endpointType {
+	c := config.GetInstance()
+	presets := c.GetJasnaPresets()
+
+	endpoints := make([]endpointType, 0, len(presets))
+	slugs := make(map[string]bool)
+
+	for _, p := range presets {
+		if p.MaxClipSize <= 0 {
+			continue
+		}
+
+		slug := config.MakeUniqueSlug(slugs, p.Name)
+
+		label := p.Name
+		ext := ".jasna-" + slug
+
+		endpoints = append(endpoints, endpointType{
+			label:     label,
+			mimeType:  ffmpeg.MimeHLS,
+			extension: ext,
+		})
+	}
+
+	return endpoints
+}
+
 func GetVideoFileContainer(file *models.VideoFile) (ffmpeg.Container, error) {
 	var container ffmpeg.Container
 	format := file.Format
@@ -212,6 +239,12 @@ func GetSceneStreamPaths(scene *models.Scene, directStreamURL *url.URL, maxStrea
 	}
 
 	endpoints = append(endpoints, mp4Streams...)
+
+	jasnaEndpoints := getJasnaEndpointTypes()
+	for _, jt := range jasnaEndpoints {
+		endpoints = append(endpoints, makeStreamEndpoint(jt, ""))
+	}
+
 	endpoints = append(endpoints, webmStreams...)
 	endpoints = append(endpoints, hlsStreams...)
 	endpoints = append(endpoints, dashStreams...)

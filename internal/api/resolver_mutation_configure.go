@@ -727,3 +727,25 @@ func (r *mutationResolver) ConfigurePlugin(ctx context.Context, pluginID string,
 
 	return c.GetPluginConfiguration(pluginID), nil
 }
+
+func (r *mutationResolver) ConfigureJasna(ctx context.Context, input ConfigJasnaInput) (*ConfigJasnaResult, error) {
+	c := config.GetInstance()
+
+	presets := make([]config.JasnaPreset, 0, len(input.Presets))
+	for _, p := range input.Presets {
+		secondaryRestoration := ""
+		if p.SecondaryRestoration != nil {
+			secondaryRestoration = *p.SecondaryRestoration
+		}
+		presets = append(presets, config.JasnaPreset{
+			Name:                 p.Name,
+			MaxClipSize:          p.MaxClipSize,
+			TemporalOverlap:      p.TemporalOverlap,
+			SecondaryRestoration: secondaryRestoration,
+		})
+	}
+
+	c.SetJasnaPresets(presets)
+
+	return makeConfigJasnaResult(), nil
+}

@@ -2755,6 +2755,11 @@ export const useConfigurePlugin = () =>
     update: updateConfiguration,
   });
 
+export const useConfigureJasna = () =>
+  GQL.useConfigureJasnaMutation({
+    update: updateConfiguration,
+  });
+
 export const useEnableDLNA = () => GQL.useEnableDlnaMutation();
 
 export const useDisableDLNA = () => GQL.useDisableDlnaMutation();

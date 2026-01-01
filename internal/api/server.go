@@ -571,11 +571,14 @@ func setPageSecurityHeaders(w http.ResponseWriter, r *http.Request, plugins []*p
 		"'self'",
 		"'unsafe-inline'",
 	}
-	mediaSrc := "blob: 'self'"
+	mediaSrc := "blob: 'self' http://localhost:8765"
 
 	// Workaround Safari bug https://bugs.webkit.org/show_bug.cgi?id=201591
 	// Allows websocket requests to any origin
 	connectSrcSlice = append(connectSrcSlice, "ws:", "wss:")
+
+	// Allow HLS streaming from jasna-cli
+	connectSrcSlice = append(connectSrcSlice, "http://localhost:8765")
 
 	// The graphql playground pulls its frontend from a cdn
 	if r.URL.Path == playgroundEndpoint {

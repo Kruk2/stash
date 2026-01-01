@@ -1,31 +1,50 @@
 {
-    "actions": {
-        "anonymise": "Anonymize",
-        "download_anonymised": "Download anonymized",
-        "customise": "Customize",
-        "optimise_database": "Optimize Database"
+  "actions": {
+    "anonymise": "Anonymize",
+    "download_anonymised": "Download anonymized",
+    "customise": "Customize",
+    "optimise_database": "Optimize Database"
+  },
+  "config": {
+    "tools": {
+      "scene_filename_parser": {
+        "ignore_organized": "Ignore organized scenes"
+      }
     },
-    "config": {
-        "tools": {
-            "scene_filename_parser": {
-                "ignore_organized": "Ignore organized scenes"
-            }
-        },
-        "ui": {
-            "custom_locales": {
-                "heading": "Custom localization",
-                "option_label": "Custom localization enabled"
-            }
-        }
+    "ui": {
+      "custom_locales": {
+        "heading": "Custom localization",
+        "option_label": "Custom localization enabled"
+      }
     },
-    "eye_color": "Eye Color",
-    "favourite": "Favorite",
-    "hair_color": "Hair Color",
-    "organized": "Organized",
-    "performer_favorite": "Performer Favorited",
-    "component_tagger": {
-        "config": {
-            "mark_organized_label": "Mark as Organized on save"
-        }
+    "jasna": {
+      "presets": "Presets",
+      "presets_description": "AI upscaling presets for video playback",
+      "preset_title": "Jasna Preset",
+      "preset_name": "Name",
+      "max_clip_size": "Max Clip Size (seconds)",
+      "max_clip_size_description": "Maximum duration of each video clip processed by jasna-cli",
+      "temporal_overlap": "Temporal Overlap (seconds)",
+      "temporal_overlap_description": "Duration of overlapping frames between clips to ensure seamless transitions",
+      "secondary_restoration": "Secondary Restoration",
+      "restoration": {
+        "none": "None",
+        "unet_4x": "UNet 4x",
+        "rtx_super_res": "RTX Super Resolution"
+      }
+    },
+    "categories": {
+      "jasna": "Jasna"
     }
+  },
+  "eye_color": "Eye Color",
+  "favourite": "Favorite",
+  "hair_color": "Hair Color",
+  "organized": "Organized",
+  "performer_favorite": "Performer Favorited",
+  "component_tagger": {
+    "config": {
+      "mark_organized_label": "Mark as Organized on save"
+    }
+  }
 }

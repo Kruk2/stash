@@ -61,6 +61,7 @@ func (rs sceneRoutes) Routes() chi.Router {
 		// streaming endpoints
 		r.Get("/stream", rs.StreamDirect)
 		r.Get("/stream.mp4", rs.StreamMp4)
+		r.Get("/stream.jasna-{preset}", rs.StreamJasna)
 		r.Get("/stream.webm", rs.StreamWebM)
 		r.Get("/stream.mkv", rs.StreamMKV)
 		r.Get("/stream.m3u8", rs.StreamHLS)
@@ -101,6 +102,59 @@ func (rs sceneRoutes) StreamDirect(w http.ResponseWriter, r *http.Request) {
 
 func (rs sceneRoutes) StreamMp4(w http.ResponseWriter, r *http.Request) {
 	rs.streamTranscode(w, r, ffmpeg.StreamTypeMP4)
+}
+
+func (rs sceneRoutes) streamJasna(w http.ResponseWriter, r *http.Request, extraArgs []string) {
+	scene := r.Context().Value(sceneKey).(*models.Scene)
+
+	streamManager := manager.GetInstance().StreamManager
+	if streamManager == nil {
+		http.Error(w, "Live transcoding disabled", http.StatusServiceUnavailable)
+		return
+	}
+
+	f := scene.Files.Primary()
+	if f == nil {
+		return
+	}
+
+	startTime, _ := strconv.ParseFloat(r.URL.Query().Get("start"), 64)
+
+	logger.Debugf("[transcode] streaming scene %d via jasna-cli (start=%.1f)", scene.ID, startTime)
+	streamManager.ServeJasna(w, r, f, extraArgs, startTime)
+}
+
+func (rs sceneRoutes) StreamJasna(w http.ResponseWriter, r *http.Request) {
+	preset := chi.URLParam(r, "preset")
+	if preset == "" {
+		http.Error(w, "preset required", http.StatusBadRequest)
+		return
+	}
+
+	c := config.GetInstance()
+	presets := c.GetJasnaPresets()
+
+	var found *config.JasnaPreset
+	for _, p := range presets {
+		if config.MakeSlug(p.Name) == preset {
+			found = &p
+			break
+		}
+	}
+
+	if found == nil {
+		http.Error(w, "preset not found: "+preset, http.StatusNotFound)
+		return
+	}
+
+	var extraArgs []string
+	extraArgs = append(extraArgs, "--max-clip-size", strconv.Itoa(found.MaxClipSize))
+	extraArgs = append(extraArgs, "--temporal-overlap", strconv.Itoa(found.TemporalOverlap))
+	if found.SecondaryRestoration != "" {
+		extraArgs = append(extraArgs, "--secondary-restoration", found.SecondaryRestoration)
+	}
+
+	rs.streamJasna(w, r, extraArgs)
 }
 
 func (rs sceneRoutes) StreamWebM(w http.ResponseWriter, r *http.Request) {

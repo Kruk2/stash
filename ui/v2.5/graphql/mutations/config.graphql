@@ -40,6 +40,12 @@ mutation ConfigureDefaults($input: ConfigDefaultSettingsInput!) {
   }
 }
 
+mutation ConfigureJasna($input: ConfigJasnaInput!) {
+  configureJasna(input: $input) {
+    ...ConfigJasnaData
+  }
+}
+
 mutation ConfigureUI($input: Map, $partial: Map) {
   configureUI(input: $input, partial: $partial)
 }

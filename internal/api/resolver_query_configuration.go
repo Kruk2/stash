@@ -66,6 +66,7 @@ func makeConfigResult() *ConfigResult {
 		Scraping:  makeConfigScrapingResult(),
 		Defaults:  makeConfigDefaultsResult(),
 		UI:        makeConfigUIResult(),
+		Jasna:     makeConfigJasnaResult(),
 	}
 }
 
@@ -284,4 +285,24 @@ func (r *queryResolver) ValidateStashBoxCredentials(ctx context.Context, input c
 	}
 
 	return &result, nil
+}
+
+func makeConfigJasnaResult() *ConfigJasnaResult {
+	c := config.GetInstance()
+	presets := c.GetJasnaPresets()
+
+	result := make([]*JasnaPreset, 0, len(presets))
+	for _, p := range presets {
+		secondaryRestoration := p.SecondaryRestoration
+		result = append(result, &JasnaPreset{
+			Name:                 p.Name,
+			MaxClipSize:          p.MaxClipSize,
+			TemporalOverlap:      p.TemporalOverlap,
+			SecondaryRestoration: &secondaryRestoration,
+		})
+	}
+
+	return &ConfigJasnaResult{
+		Presets: result,
+	}
 }
