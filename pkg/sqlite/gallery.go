@@ -12,6 +12,7 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/jmoiron/sqlx"
 	"github.com/stashapp/stash/pkg/models"
+	"github.com/stashapp/stash/pkg/pathmap"
 	"gopkg.in/guregu/null.v4"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -89,9 +90,9 @@ func (r *galleryQueryRow) resolve() *models.Gallery {
 	}
 
 	if r.PrimaryFileFolderPath.Valid && r.PrimaryFileBasename.Valid {
-		ret.Path = filepath.Join(r.PrimaryFileFolderPath.String, r.PrimaryFileBasename.String)
+		ret.Path = pathmap.Map(filepath.Join(r.PrimaryFileFolderPath.String, r.PrimaryFileBasename.String))
 	} else if r.FolderPath.Valid {
-		ret.Path = r.FolderPath.String
+		ret.Path = pathmap.Map(r.FolderPath.String)
 	}
 
 	return ret

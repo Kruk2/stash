@@ -12,6 +12,7 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/jmoiron/sqlx"
 	"github.com/stashapp/stash/pkg/models"
+	"github.com/stashapp/stash/pkg/pathmap"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -56,7 +57,7 @@ func (r *folderQueryRow) resolve() *models.Folder {
 			ZipFileID: nullIntFileIDPtr(r.ZipFileID),
 			ModTime:   r.ModTime.Timestamp,
 		},
-		Path:           string(r.Path),
+		Path:           pathmap.Map(string(r.Path)),
 		ParentFolderID: nullIntFolderIDPtr(r.ParentFolderID),
 		CreatedAt:      r.CreatedAt.Timestamp,
 		UpdatedAt:      r.UpdatedAt.Timestamp,
@@ -65,7 +66,7 @@ func (r *folderQueryRow) resolve() *models.Folder {
 	if ret.ZipFileID != nil && r.ZipFolderPath.Valid && r.ZipBasename.Valid {
 		ret.ZipFile = &models.BaseFile{
 			ID:       *ret.ZipFileID,
-			Path:     filepath.Join(r.ZipFolderPath.String, r.ZipBasename.String),
+			Path:     pathmap.Map(filepath.Join(r.ZipFolderPath.String, r.ZipBasename.String)),
 			Basename: r.ZipBasename.String,
 			Size:     r.ZipSize.Int64,
 		}

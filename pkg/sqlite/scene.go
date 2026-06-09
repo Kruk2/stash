@@ -18,6 +18,7 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 
 	"github.com/stashapp/stash/pkg/models"
+	"github.com/stashapp/stash/pkg/pathmap"
 	"github.com/stashapp/stash/pkg/sliceutil"
 	"github.com/stashapp/stash/pkg/utils"
 )
@@ -149,7 +150,7 @@ func (r *sceneQueryRow) resolve() *models.Scene {
 	}
 
 	if r.PrimaryFileFolderPath.Valid && r.PrimaryFileBasename.Valid {
-		ret.Path = filepath.Join(r.PrimaryFileFolderPath.String, r.PrimaryFileBasename.String)
+		ret.Path = pathmap.Map(filepath.Join(r.PrimaryFileFolderPath.String, r.PrimaryFileBasename.String))
 	}
 
 	return ret
