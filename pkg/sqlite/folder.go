@@ -32,9 +32,12 @@ type folderRow struct {
 
 func (r *folderRow) fromFolder(o models.Folder) {
 	r.ID = o.ID
-	// derive basename from path
+	// derive basename from the (Linux) path before translating it back
 	r.Basename = filepath.Base(o.Path)
-	r.Path = o.Path
+	// store the original Windows-style path in the DB so data created on
+	// Windows is matched and updated in place rather than duplicated.
+	// No-op on Windows builds and on native Linux paths.
+	r.Path = pathmap.Unmap(o.Path)
 	r.ZipFileID = nullIntFromFileIDPtr(o.ZipFileID)
 	r.ParentFolderID = nullIntFromFolderIDPtr(o.ParentFolderID)
 	r.ModTime = Timestamp{Timestamp: o.ModTime}
@@ -297,6 +300,9 @@ func (qb *FolderStore) FindMany(ctx context.Context, ids []models.FolderID) ([]*
 }
 
 func (qb *FolderStore) FindByPath(ctx context.Context, p string, caseSensitive bool) (*models.Folder, error) {
+	// translate the (Linux) query path back to the Windows-style path stored in the DB
+	p = pathmap.Unmap(p)
+
 	// use like for case insensitive search
 	var criterion exp.BooleanExpression
 	if caseSensitive {
@@ -451,7 +457,10 @@ func (qb *FolderStore) allInPaths(q *goqu.SelectDataset, p []string) *goqu.Selec
 
 	var conds []exp.Expression
 	for _, pp := range p {
-		ppWildcard := pp + string(filepath.Separator) + "%"
+		// translate the (Linux) path to the Windows-style path stored in the DB,
+		// and use the matching separator for the LIKE pattern
+		pp = pathmap.Unmap(pp)
+		ppWildcard := pp + pathmap.Sep(pp) + "%"
 
 		conds = append(conds, table.Col("path").Eq(pp), table.Col("path").Like(ppWildcard))
 	}

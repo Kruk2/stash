@@ -9,6 +9,7 @@ import (
 	"github.com/stashapp/stash/internal/manager/config"
 	"github.com/stashapp/stash/pkg/fsutil"
 	"github.com/stashapp/stash/pkg/models"
+	"github.com/stashapp/stash/pkg/pathmap"
 	"golang.org/x/text/collate"
 )
 
@@ -25,7 +26,10 @@ func (r *queryResolver) Directory(ctx context.Context, path, locale *string) (*D
 
 	var dirPath = ""
 	if path != nil {
-		dirPath = *path
+		// Translate Windows-style paths (e.g. "M:\Movies") seeded from the
+		// library config into native Linux paths so subfolders can be browsed.
+		// No-op on Windows builds.
+		dirPath = pathmap.Map(*path)
 	}
 	currentDir := getDir(dirPath)
 	directories, err := listDir(col, currentDir)

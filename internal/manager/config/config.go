@@ -26,6 +26,7 @@ import (
 	"github.com/stashapp/stash/pkg/logger"
 	"github.com/stashapp/stash/pkg/models"
 	"github.com/stashapp/stash/pkg/models/paths"
+	"github.com/stashapp/stash/pkg/pathmap"
 	"github.com/stashapp/stash/pkg/sliceutil"
 	"github.com/stashapp/stash/pkg/utils"
 )
@@ -686,6 +687,14 @@ func (i *Config) GetStashPaths() StashConfigs {
 			}
 			ret = append(ret, toAdd)
 		}
+	}
+
+	// Translate Windows-style stash paths (e.g. "M:\Movies") stored in the
+	// config into native Linux paths ("/mnt/m/Movies") so the rest of the app
+	// (scanner, filters, file browser) operates entirely in Linux path space.
+	// No-op on Windows builds and on already-native Linux paths.
+	for _, s := range ret {
+		s.Path = pathmap.Map(s.Path)
 	}
 
 	return ret

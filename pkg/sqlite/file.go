@@ -644,9 +644,12 @@ func (qb *FileStore) FindByPath(ctx context.Context, p string, caseSensitive boo
 // FindAllByPath returns all the files that match the given path.
 // Wildcard characters are supported.
 func (qb *FileStore) FindAllByPath(ctx context.Context, p string, caseSensitive bool) ([]models.File, error) {
-	// separate basename from path
+	// separate basename from path (done in Linux path space, before translation)
 	basename := filepath.Base(p)
 	dirName := filepath.Dir(p)
+
+	// translate the dir to the Windows-style path stored in the folders table
+	dirName = pathmap.Unmap(dirName)
 
 	// replace wildcards
 	basename = strings.ReplaceAll(basename, "*", "%")
@@ -683,7 +686,10 @@ func (qb *FileStore) allInPaths(q *goqu.SelectDataset, p []string) *goqu.SelectD
 
 	var conds []exp.Expression
 	for _, pp := range p {
-		ppWildcard := pp + string(filepath.Separator) + "%"
+		// translate the (Linux) path to the Windows-style path stored in the DB,
+		// and use the matching separator for the LIKE pattern
+		pp = pathmap.Unmap(pp)
+		ppWildcard := pp + pathmap.Sep(pp) + "%"
 
 		conds = append(conds, folderTable.Col("path").Eq(pp), folderTable.Col("path").Like(ppWildcard))
 	}
